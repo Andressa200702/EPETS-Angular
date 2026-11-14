@@ -2,8 +2,6 @@
 
 Front-end da E’PETS, uma loja online de rações e acessórios para cães, gatos, roedores e aves silvestres, com painel administrativo de estoque. O visual segue o protótipo feito no Figma Make.
 
-> **Projeto de demonstração.** Os dados ficam no navegador (`localStorage`) e nenhum pagamento é real. A integração com o back-end (Spring Boot) é a próxima etapa.
-
 ## Funcionalidades
 
 ### Loja
