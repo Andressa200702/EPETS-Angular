@@ -3,11 +3,12 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { map } from 'rxjs';
 import { ProductCard } from '../../components/product-card/product-card';
+import { CATEGORIAS, FAIXAS_PRECO, MARCAS } from '../../models/categorias';
 import { Product } from '../../models/product';
 import { ProductService } from '../../services/products';
 
 type Sort = 'relevancia' | 'menor' | 'maior' | 'nome';
-type FilterKey = 'pet' | 'cat' | 'marca' | 'fase';
+type FilterKey = 'pet' | 'cat' | 'marca' | 'fase' | 'preco';
 
 @Component({
   selector: 'app-catalog',
@@ -30,24 +31,34 @@ export class Catalog {
     cat: this.params().getAll('cat'),
     marca: this.params().getAll('marca'),
     fase: this.params().getAll('fase'),
+    preco: this.params().getAll('preco'),
   }));
 
-  protected readonly groups: { key: FilterKey; titulo: string; pick: (p: Product) => string }[] = [
-    { key: 'pet', titulo: 'Seu pet', pick: (p) => p.pet },
-    { key: 'cat', titulo: 'Categoria', pick: (p) => p.category },
-    { key: 'fase', titulo: 'Fase da vida', pick: (p) => p.fase },
-    { key: 'marca', titulo: 'Marca', pick: (p) => p.brand },
+  // mesma ordem do Figma: Seu pet, Marca, Fase e necessidade, Tipo de produto, Faixa de preço
+  protected readonly groups: { key: FilterKey; titulo: string; pick: (p: Product) => string; fixos?: string[] }[] = [
+    { key: 'pet', titulo: 'Seu pet', pick: (p) => p.pet, fixos: ['Cães', 'Gatos', 'Roedores', 'Aves silvestres'] },
+    { key: 'marca', titulo: 'Marca', pick: (p) => p.brand, fixos: MARCAS },
+    { key: 'fase', titulo: 'Fase e necessidade', pick: (p) => p.fase, fixos: ['Filhotes', 'Adultos', 'Castrados'] },
+    { key: 'cat', titulo: 'Tipo de produto', pick: (p) => p.category, fixos: CATEGORIAS },
   ];
 
-  /** opções de cada grupo, com a contagem sobre o catálogo todo */
+  /** opções de cada grupo, com a contagem sobre o catálogo todo (opções fixas aparecem mesmo com 0) */
   protected readonly options = computed(() => {
     const all = this.products.items();
-    return this.groups.map((g) => {
-      const counts = new Map<string, number>();
+    const grupos = this.groups.map((g) => {
+      const counts = new Map<string, number>((g.fixos ?? []).map((v) => [v, 0]));
       for (const p of all) counts.set(g.pick(p), (counts.get(g.pick(p)) ?? 0) + 1);
-      const values = [...counts.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
-      return { ...g, values };
+      let values = [...counts.entries()];
+      // marca: ordem alfabética; demais: ordem definida em `fixos`, depois as extras
+      if (g.key === 'marca') values = values.sort((a, b) => a[0].localeCompare(b[0]));
+      return { key: g.key, titulo: g.titulo, values: values.map(([value, n]) => ({ value, label: value, n })) };
     });
+    const faixas = {
+      key: 'preco' as FilterKey,
+      titulo: 'Faixa de preço',
+      values: FAIXAS_PRECO.map((f) => ({ value: f.key, label: f.label, n: all.filter((p) => f.test(p.price)).length })),
+    };
+    return [...grupos, faixas];
   });
 
   protected readonly result = computed(() => {
@@ -58,6 +69,7 @@ export class Catalog {
       if (sel.cat.length && !sel.cat.includes(p.category)) return false;
       if (sel.fase.length && !sel.fase.includes(p.fase)) return false;
       if (sel.marca.length && !sel.marca.includes(p.brand)) return false;
+      if (sel.preco.length && !FAIXAS_PRECO.some((f) => sel.preco.includes(f.key) && f.test(p.price))) return false;
       if (q && !norm(`${p.name} ${p.brand} ${p.pet} ${p.category} ${p.detail}`).includes(q)) return false;
       return true;
     });
@@ -74,7 +86,7 @@ export class Catalog {
 
   protected readonly hasFilters = computed(() => {
     const s = this.selected();
-    return !!(this.q() || s.pet.length || s.cat.length || s.fase.length || s.marca.length);
+    return !!(this.q() || s.pet.length || s.cat.length || s.fase.length || s.marca.length || s.preco.length);
   });
 
   protected readonly title = computed(() => {

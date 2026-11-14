@@ -1,0 +1,40 @@
+<div class="wrap page">
+  <nav class="crumbs" aria-label="Você está aqui"><a routerLink="/">Início</a> / <span>Meus pedidos</span></nav>
+  <h1>Meus pedidos</h1>
+
+  @if (lista().length === 0) {
+    <div class="empty card">
+      <h2>Você ainda não fez nenhum pedido.</h2>
+      <p class="muted">Quando você finalizar uma compra, ela aparece aqui.</p>
+      <a class="btn" routerLink="/catalogo">Ver produtos</a>
+    </div>
+  } @else {
+    <p class="lead">{{ lista().length }} {{ lista().length === 1 ? 'pedido' : 'pedidos' }} neste navegador.</p>
+    <ul class="list">
+      @for (o of lista(); track o.id) {
+        <li class="order card">
+          <div class="top">
+            <div>
+              <span class="eyebrow">Pedido #{{ o.id }}</span>
+              <p class="muted small">{{ o.date | date: "dd/MM/yyyy 'às' HH:mm" }}</p>
+            </div>
+            <span class="status">Pedido recebido</span>
+          </div>
+          <ul class="items">
+            @for (i of o.items; track i.productId) {
+              <li><span><strong>{{ i.qty }}×</strong> {{ i.name }}</span><span>{{ i.price * i.qty | currency: 'BRL' }}</span></li>
+            }
+          </ul>
+          <div class="bottom">
+            <span class="muted small">
+              {{ o.entrega === 'entrega' ? 'Entrega em casa' : 'Retirada na loja' }} •
+              {{ pagamento(o.pagamento, o.parcelas, o.cartaoFinal) }}
+            </span>
+            <strong class="total">{{ o.total | currency: 'BRL' }}</strong>
+          </div>
+          <a class="link" [routerLink]="['/confirmacao', o.id]">Ver detalhes →</a>
+        </li>
+      }
+    </ul>
+  }
+</div>

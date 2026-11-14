@@ -85,7 +85,7 @@
         </label>
         <label class="field" [class.invalid]="invalido('category')">
           Categoria
-          <input formControlName="category" list="cats" placeholder="Rações, Higiene…" />
+          <input formControlName="category" list="cats" placeholder="Rações e alimentos, Higiene e saúde…" />
           <datalist id="cats">@for (c of categorias(); track c) { <option [value]="c"></option> }</datalist>
           @if (invalido('category')) { <span class="err">Obrigatório.</span> }
         </label>

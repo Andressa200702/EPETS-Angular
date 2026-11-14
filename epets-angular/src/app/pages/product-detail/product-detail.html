@@ -11,7 +11,7 @@
       <div class="photo card"><app-product-img [product]="p" /></div>
 
       <div class="info">
-        <span class="eyebrow">{{ p.pet }} · {{ p.category === 'Rações' ? p.fase : p.category }}</span>
+        <span class="eyebrow">{{ rotulo(p) }}</span>
         <h1>{{ p.name }}</h1>
         <p class="lead">{{ p.detail }}</p>
 

@@ -24,6 +24,9 @@
           }
         </ul>
         <div class="row"><span>Subtotal</span><span>{{ o.subtotal | currency: 'BRL' }}</span></div>
+        @if (o.desconto) {
+          <div class="row"><span>Desconto{{ o.cupom ? ' (' + o.cupom + ')' : '' }}</span><span>− {{ o.desconto | currency: 'BRL' }}</span></div>
+        }
         <div class="row"><span>{{ o.entrega === 'entrega' ? 'Entrega' : 'Retirada' }}</span><span>{{ o.frete === 0 ? 'Grátis' : (o.frete | currency: 'BRL') }}</span></div>
         <div class="row grand"><span>Total</span><span>{{ o.total | currency: 'BRL' }}</span></div>
       </div>

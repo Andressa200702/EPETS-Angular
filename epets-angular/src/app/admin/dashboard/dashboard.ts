@@ -23,8 +23,8 @@ export class Dashboard {
   protected readonly chart = computed(() => {
     const data = this.products.stockByCategory();
     const max = Math.max(1, ...data.map((d) => d.value));
-    return data.map((d) => ({ ...d, pct: Math.max(2, (d.value / max) * 100) }));
-  });
+    return data.map((d) => ({ ...d, curto: d.label.split(/[ ,]/)[0], pct: Math.max(2, (d.value / max) * 100) })); 
+   });
   protected readonly recent = computed(() => this.stock.list().slice(0, 5));
 
   /** baixa um CSV (separador ; e BOM, abre direto no Excel em português) */

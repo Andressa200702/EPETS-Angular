@@ -4,9 +4,9 @@ import { NavigationEnd, Router, RouterLink } from '@angular/router';
 import { filter, map, startWith } from 'rxjs';
 import { WHATSAPP_URL } from '../../config/contato';
 import { AuthService } from '../../services/auth';
+import { ACESSORIOS } from '../../models/categorias';
 import { CartService } from '../../services/cart';
 
-export const ACESSORIOS = ['Caminhas', 'Coleiras', 'Brinquedos', 'Comedouros e bebedouros', 'Higiene'];
 
 interface NavItem {
   label: string;
@@ -31,6 +31,7 @@ export class Header {
   protected readonly cart = inject(CartService);
   protected readonly auth = inject(AuthService);
   protected readonly whatsapp = WHATSAPP_URL;
+  protected readonly primeiroNome = computed(() => this.auth.user()?.name.trim().split(/\s+/)[0] ?? '');
 
   /** menu do bonequinho (só abre quando a pessoa está logada) */
   protected readonly menuAberto = signal(false);

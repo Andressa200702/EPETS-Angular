@@ -3,7 +3,7 @@ import { Product } from '../models/product';
 import { SEED_PRODUCTS } from '../models/seed';
 import { Storage } from './storage';
 
-const KEY = 'epets.products.v1';
+const KEY = 'epets.products.v2';
 
 /**
  * Catálogo + estoque.

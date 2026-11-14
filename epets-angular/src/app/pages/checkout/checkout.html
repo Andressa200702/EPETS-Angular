@@ -79,6 +79,51 @@
             <label class="opt"><input type="radio" formControlName="pagamento" value="cartao" /> <span><strong>Cartão de crédito</strong><small>Em até 3x sem juros</small></span></label>
             <label class="opt"><input type="radio" formControlName="pagamento" value="dinheiro" /> <span><strong>Dinheiro na entrega/retirada</strong><small>Pague ao receber</small></span></label>
           </div>
+
+          @if (cartao()) {
+            <div class="pay">
+              <label class="field" [class.invalid]="invalid('cartaoNumero')">
+                Número do cartão
+                <input formControlName="cartaoNumero" inputmode="numeric" autocomplete="cc-number" placeholder="0000 0000 0000 0000" (input)="mascarar('cartaoNumero', $event)" />
+                @if (invalid('cartaoNumero')) { <span class="err">Número de cartão inválido.</span> }
+              </label>
+              <label class="field" [class.invalid]="invalid('cartaoNome')">
+                Nome impresso no cartão
+                <input formControlName="cartaoNome" autocomplete="cc-name" />
+                @if (invalid('cartaoNome')) { <span class="err">Informe o nome.</span> }
+              </label>
+              <div class="two">
+                <label class="field" [class.invalid]="invalid('cartaoValidade')">
+                  Validade
+                  <input formControlName="cartaoValidade" inputmode="numeric" autocomplete="cc-exp" placeholder="MM/AA" (input)="mascarar('cartaoValidade', $event)" />
+                  @if (invalid('cartaoValidade')) { <span class="err">Validade inválida.</span> }
+                </label>
+                <label class="field" [class.invalid]="invalid('cartaoCvv')">
+                  CVV
+                  <input formControlName="cartaoCvv" inputmode="numeric" autocomplete="cc-csc" placeholder="123" (input)="mascarar('cartaoCvv', $event)" />
+                  @if (invalid('cartaoCvv')) { <span class="err">3 ou 4 números.</span> }
+                </label>
+              </div>
+              <label class="field">
+                Parcelas
+                <select formControlName="parcelas">
+                  @for (o of opcoesParcela(); track o.n) {
+                    <option [ngValue]="o.n">{{ o.n }}x de {{ o.valor | currency: 'BRL' }} sem juros</option>
+                  }
+                </select>
+              </label>
+              <p class="demo">Demonstração: nenhum dado é enviado e só os 4 últimos dígitos ficam salvos no pedido.</p>
+            </div>
+          }
+
+          @if (pix()) {
+            <div class="pay">
+              <p>Copie o código abaixo e cole no app do seu banco (Pix copia e cola):</p>
+              <textarea class="pixcode" readonly rows="4" [value]="pixCodigo()"></textarea>
+              <button type="button" class="btn ghost sm" (click)="copiarPix()">{{ copiado() ? 'Código copiado ✓' : 'Copiar código Pix' }}</button>
+              <p class="demo">Demonstração: a chave é fictícia, então o código não recebe pagamento de verdade.</p>
+            </div>
+          }
         </fieldset>
       </div>
 
@@ -91,6 +136,9 @@
         </ul>
         <div class="row"><span>Subtotal</span><span>{{ cart.subtotal() | currency: 'BRL' }}</span></div>
         <div class="row"><span>{{ retirada() ? 'Retirada' : 'Entrega' }}</span><span>{{ frete() === 0 ? 'Grátis' : (frete() | currency: 'BRL') }}</span></div>
+        @if (cart.desconto() > 0) {
+          <div class="row"><span>Desconto ({{ cart.cupom() }})</span><span>− {{ cart.desconto() | currency: 'BRL' }}</span></div>
+        }
         <div class="row grand"><span>Total</span><span>{{ total() | currency: 'BRL' }}</span></div>
         @if (erro()) { <p class="err" role="alert">{{ erro() }}</p> }
         @if (submitted() && form.invalid) { <p class="err" role="alert">Confira os campos destacados.</p> }

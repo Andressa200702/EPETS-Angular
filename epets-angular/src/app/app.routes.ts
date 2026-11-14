@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { adminGuard, visitanteGuard } from './guards/auth.guard';
+import { adminGuard, clienteGuard, visitanteGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
   // ---------- entrar / criar conta (tela própria, sem header e footer)
@@ -28,6 +28,7 @@ export const routes: Routes = [
       { path: 'produto/:id', title: 'Produto • E’PETS', loadComponent: () => import('./pages/product-detail/product-detail').then((m) => m.ProductDetail) },
       { path: 'sacola', title: 'Sua sacola • E’PETS', loadComponent: () => import('./pages/cart/cart').then((m) => m.CartPage) },
       { path: 'checkout', title: 'Finalizar compra • E’PETS', loadComponent: () => import('./pages/checkout/checkout').then((m) => m.Checkout) },
+      { path: 'meus-pedidos', canActivate: [clienteGuard], title: 'Meus pedidos • E’PETS', loadComponent: () => import('./pages/my-orders/my-orders').then((m) => m.MyOrders) },
       { path: 'confirmacao/:id', title: 'Pedido confirmado • E’PETS', loadComponent: () => import('./pages/confirmation/confirmation').then((m) => m.Confirmation) },
     ],
   },

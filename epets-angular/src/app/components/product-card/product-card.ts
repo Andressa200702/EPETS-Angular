@@ -1,6 +1,7 @@
 import { CurrencyPipe } from '@angular/common';
 import { Component, computed, inject, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { rotulo } from '../../models/categorias';
 import { Product } from '../../models/product';
 import { CartService } from '../../services/cart';
 import { ProductImg } from '../product-img';
@@ -16,8 +17,7 @@ export class ProductCard {
   private readonly cart = inject(CartService);
 
   protected readonly label = computed(() => {
-    const p = this.product();
-    return `${p.pet} · ${p.category === 'Rações' ? p.fase : p.category}`;
+    return rotulo(this.product());
   });
   protected readonly soldOut = computed(() => this.product().stock === 0);
   protected readonly low = computed(() => this.product().stock > 0 && this.product().stock <= this.product().minStock);

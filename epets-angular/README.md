@@ -39,3 +39,5 @@ chamadas `HttpClient` — as telas não precisam mudar.
 
 Coloque as fotos em `public/img/` com os nomes de `src/app/models/seed.ts`
 (ex.: `p-golden-adultos.jpg`). Enquanto não existirem, aparece um placeholder.
+- **Meus pedidos** (`/meus-pedidos`): lista os pedidos da pessoa logada; link no cabeçalho e no menu da conta.
+- **Pagamento**: cartão com máscara e validação (número de teste `4111 1111 1111 1111`) e Pix "copia e cola" de demonstração.

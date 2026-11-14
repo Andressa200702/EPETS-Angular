@@ -53,5 +53,10 @@ export interface Order {
   items: OrderItem[];
   subtotal: number;
   frete: number;
+  desconto?: number;
+  cupom?: string;
+  parcelas?: number;
+  cartaoFinal?: string;
+  userId?: string;
   total: number;
 }

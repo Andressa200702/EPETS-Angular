@@ -4,8 +4,17 @@ import { ProductService } from './products';
 import { Storage } from './storage';
 
 const KEY = 'epets.cart.v1';
+const KEY_CUPOM = 'epets.cart.cupom.v1';
+const KEY_CEP = 'epets.cart.cep.v1';
+
+/** Frete de entrega local (igual ao Figma: R$ 12,90, até 2 dias úteis). */
 export const FRETE_FIXO = 12.9;
-export const FRETE_GRATIS_ACIMA = 149;
+export const PRAZO_ENTREGA = 'até 2 dias úteis';
+
+/** Cupons de demonstração (percentual sobre os produtos). */
+export const CUPONS: Record<string, number> = { BEMVINDO10: 0.1 };
+
+export type ResultadoCupom = { ok: true; codigo: string } | { ok: false; erro: string };
 
 export interface CartItem {
   product: Product;
@@ -28,11 +37,40 @@ export class CartService {
   );
   readonly count = computed(() => this.items().reduce((s, i) => s + i.qty, 0));
   readonly subtotal = computed(() => this.items().reduce((s, i) => s + i.total, 0));
-  readonly freteEntrega = computed(() => (this.subtotal() >= FRETE_GRATIS_ACIMA || this.subtotal() === 0 ? 0 : FRETE_FIXO));
-  readonly faltaFreteGratis = computed(() => Math.max(0, FRETE_GRATIS_ACIMA - this.subtotal()));
+  readonly freteEntrega = computed(() => (this.subtotal() === 0 ? 0 : FRETE_FIXO));
+
+  /** cupom aplicado (ex.: BEMVINDO10) */
+  readonly cupom = signal<string>(this.storage.read<string>(KEY_CUPOM, ''));
+  readonly desconto = computed(() => Math.round(this.subtotal() * (CUPONS[this.cupom()] ?? 0) * 100) / 100);
+  readonly total = computed(() => this.subtotal() - this.desconto() + this.freteEntrega());
+
+  /** CEP usado para calcular a entrega (demonstração: sempre entrega local) */
+  readonly cep = signal<string>(this.storage.read<string>(KEY_CEP, ''));
 
   constructor() {
     effect(() => this.storage.write(KEY, this.lines()));
+    effect(() => this.storage.write(KEY_CUPOM, this.cupom()));
+    effect(() => this.storage.write(KEY_CEP, this.cep()));
+  }
+
+  aplicarCupom(texto: string): ResultadoCupom {
+    const codigo = texto.trim().toUpperCase();
+    if (!codigo) return { ok: false, erro: 'Digite o código do cupom.' };
+    if (!(codigo in CUPONS)) return { ok: false, erro: 'Cupom inválido ou expirado.' };
+    this.cupom.set(codigo);
+    return { ok: true, codigo };
+  }
+
+  removerCupom(): void {
+    this.cupom.set('');
+  }
+
+  /** valida o CEP (8 dígitos) e guarda formatado como 00000-000 */
+  calcularEntrega(texto: string): boolean {
+    const d = texto.replace(/\D/g, '');
+    if (d.length !== 8) return false;
+    this.cep.set(`${d.slice(0, 5)}-${d.slice(5)}`);
+    return true;
   }
 
   qtyOf(productId: string): number {
@@ -60,5 +98,6 @@ export class CartService {
 
   clear(): void {
     this.lines.set([]);
+    this.cupom.set('');
   }
 }

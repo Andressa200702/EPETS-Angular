@@ -19,7 +19,16 @@ header.site { background: #fff; border-bottom: 1px solid var(--border); position
 .bagbtn { font-weight: 600; font-size: 14px; }
 .bagbtn:hover { color: var(--terra); }
 
-/* ---------- bonequinho de perfil ---------- */
+/* ---------- botão Entrar (igual ao Figma) ---------- */
+.hact .entrar {
+  display: inline-flex; align-items: center; gap: 8px; cursor: pointer;
+  height: 42px; padding: 0 16px; border: 1px solid var(--border); border-radius: 8px; background: #fff;
+  font-size: 13px; font-weight: 600; transition: border-color .15s, color .15s;
+}
+.hact .entrar:hover { border-color: var(--terra); color: var(--terra); }
+.hact .entrar.logado { background: var(--terra-l); border-color: var(--terra); color: var(--terra); }
+
+/* ---------- menu da conta ---------- */
 .perfil { position: relative; }
 .perfil-btn {
   width: 42px; height: 42px; border-radius: 50%; display: inline-grid !important; place-items: center;

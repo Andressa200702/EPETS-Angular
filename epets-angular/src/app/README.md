@@ -39,3 +39,11 @@ chamadas `HttpClient` — as telas não precisam mudar.
 
 Coloque as fotos em `public/img/` com os nomes de `src/app/models/seed.ts`
 (ex.: `p-golden-adultos.jpg`). Enquanto não existirem, aparece um placeholder.
+
+## Alinhado com o Figma (carrinho, catálogo, entrar)
+
+- **Sacola**: colunas Produto/Quantidade/Subtotal, "Esvaziar sacola", resumo com Produtos, Entrega local (R$ 12,90), Descontos e Total,
+  cupom de teste `BEMVINDO10` (10%) e cálculo de entrega por CEP.
+- **Catálogo**: filtros Seu pet, Marca, Fase e necessidade, Tipo de produto e Faixa de preço (opções com contagem 0 continuam visíveis).
+  Tipos e marcas ficam em `models/categorias.ts`.
+- **Cabeçalho**: botão "Entrar" (vira o nome da pessoa, com menu Painel admin / Sair, depois do login).

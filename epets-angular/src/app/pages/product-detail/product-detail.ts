@@ -5,6 +5,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { map } from 'rxjs';
 import { ProductCard } from '../../components/product-card/product-card';
 import { ProductImg } from '../../components/product-img';
+import { rotulo } from '../../models/categorias';
 import { CartService } from '../../services/cart';
 import { ProductService } from '../../services/products';
 
@@ -19,6 +20,7 @@ export class ProductDetail {
   private readonly router = inject(Router);
   private readonly products = inject(ProductService);
   protected readonly cart = inject(CartService);
+  protected readonly rotulo = rotulo;
 
   private readonly id = toSignal(this.route.paramMap.pipe(map((m) => m.get('id') ?? '')), { requireSync: true });
 

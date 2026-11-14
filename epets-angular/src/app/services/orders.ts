@@ -19,6 +19,12 @@ export class OrderService {
     effect(() => this.storage.write(KEY, this._orders()));
   }
 
+  /** pedidos de uma pessoa logada (pelo id da conta ou pelo e-mail usado na compra) */
+  doUsuario(userId: string, email: string): Order[] {
+    const e = email.trim().toLowerCase();
+    return this._orders().filter((o) => o.userId === userId || o.customer.email.trim().toLowerCase() === e);
+  }
+
   byId(id: string): Order | undefined {
     return this._orders().find((o) => o.id === id);
   }

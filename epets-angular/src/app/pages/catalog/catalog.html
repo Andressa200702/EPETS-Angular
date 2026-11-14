@@ -39,11 +39,11 @@
       @for (g of options(); track g.key) {
         <fieldset>
           <legend class="eyebrow">{{ g.titulo }}</legend>
-          @for (v of g.values; track v[0]) {
+          @for (v of g.values; track v.value) {
             <label class="check">
-              <input type="checkbox" [checked]="isChecked(g.key, v[0])" (change)="toggle(g.key, v[0])" />
-              <span class="name">{{ v[0] }}</span>
-              <span class="n">{{ v[1] }}</span>
+              <input type="checkbox" [checked]="isChecked(g.key, v.value)" (change)="toggle(g.key, v.value)" />
+              <span class="name">{{ v.label }}</span>
+              <span class="n">{{ v.n }}</span>
             </label>
           }
         </fieldset>

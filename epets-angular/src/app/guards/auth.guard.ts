@@ -15,3 +15,11 @@ export const visitanteGuard: CanActivateFn = () => {
   if (!auth.logado()) return true;
   return inject(Router).createUrlTree([auth.isAdmin() ? '/admin' : '/']);
 };
+
+/** Área da cliente (ex.: Meus pedidos): precisa estar logada. Admin vai para o painel. */
+export const clienteGuard: CanActivateFn = (_route, state) => {
+  const auth = inject(AuthService);
+  if (auth.isAdmin()) return inject(Router).createUrlTree(['/admin']);
+  if (auth.logado()) return true;
+  return inject(Router).createUrlTree(['/entrar'], { queryParams: { redirect: state.url } });
+};
