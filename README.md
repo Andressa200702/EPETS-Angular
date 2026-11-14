@@ -21,14 +21,6 @@ Front-end da E’PETS, uma loja online de rações e acessórios para cães, gat
 
 Ao finalizar um pedido, o estoque é baixado automaticamente e a venda aparece como **Saída** em Movimentações.
 
-## Tecnologias
-
-- [Angular](https://angular.dev) 22 (componentes standalone, signals, rotas com lazy loading)
-- TypeScript
-- CSS puro, sem biblioteca de componentes
-- SSR com `@angular/ssr`
-- Vitest para testes
-
 ## Como rodar
 
 Requisitos: [Node.js](https://nodejs.org) (versão LTS) e npm.
@@ -101,19 +93,3 @@ Os services (`products`, `cart`, `stock`, `orders`, `auth`) guardam tudo no `loc
 - O código Pix usa uma chave fictícia e não recebe pagamento.
 - As senhas das contas de teste ficam apenas no navegador. Para produção, a autenticação e o pagamento devem passar por um back-end e por um gateway de pagamento.
 
-## Próximos passos
-
-- [ ] Integração com a API Spring Boot
-- [ ] Pagamento real por gateway
-- [ ] Tela de pedidos no painel admin, com status
-- [ ] Catálogo completo e fotos dos produtos
-- [ ] Revisão do layout para celular
-- [ ] Recuperação de senha e edição de perfil
-
-## Scripts
-
-| Comando | O que faz |
-|---|---|
-| `npm start` | Servidor de desenvolvimento |
-| `npm run build` | Build de produção |
-| `npm test` | Testes |
