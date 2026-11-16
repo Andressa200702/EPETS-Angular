@@ -1,0 +1,161 @@
+<div class="wrap page">
+  <nav class="crumbs" aria-label="Você está aqui">
+    <a routerLink="/">Início</a> / <a routerLink="/sacola">Sacola</a> / <span>Finalizar compra</span>
+  </nav>
+  <h1>Finalizar compra</h1>
+  <p class="lead">Falta pouco! Preencha os dados abaixo. <span class="muted">(Estudo visual: nenhum pagamento real é feito.)</span></p>
+
+  @if (cart.items().length === 0) {
+    <div class="empty card">
+      <h2>Sua sacola está vazia.</h2>
+      <a class="btn" routerLink="/catalogo">Ver produtos</a>
+    </div>
+  } @else {
+    <form class="layout" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+      <div class="cols">
+        <fieldset class="card">
+          <legend>1. Seus dados</legend>
+          <!-- nome e CPF lado a lado; o CPF é pedido só aqui, na hora da compra -->
+          <div class="two">
+            <label class="field" [class.invalid]="invalid('nome')">
+              Nome completo
+              <input formControlName="nome" autocomplete="name" />
+              @if (invalid('nome')) { <span class="err">Informe seu nome completo.</span> }
+            </label>
+            <label class="field" [class.invalid]="invalid('cpf')">
+              CPF
+              <!-- maxlength trava o tamanho; (input) chama a máscara 000.000.000-00 a cada tecla -->
+              <input formControlName="cpf" inputmode="numeric" maxlength="14" autocomplete="off" placeholder="000.000.000-00" (input)="mascararCampo('cpf', $event)" />
+              @if (invalid('cpf')) { <span class="err">Digite um CPF válido.</span> }
+            </label>
+          </div>
+          <div class="two">
+            <label class="field" [class.invalid]="invalid('email')">
+              E-mail
+              <input type="email" formControlName="email" autocomplete="email" />
+              @if (invalid('email')) { <span class="err">Informe um e-mail válido.</span> }
+            </label>
+            <label class="field" [class.invalid]="invalid('telefone')">
+              Telefone / WhatsApp
+              <!-- type=tel abre o teclado numérico no celular; a máscara deixa no formato (11) 91234-5678 -->
+              <input formControlName="telefone" type="tel" inputmode="numeric" maxlength="15" autocomplete="tel" placeholder="(11) 91234-5678" (input)="mascararCampo('telefone', $event)" />
+              @if (invalid('telefone')) { <span class="err">Digite DDD + número. Ex.: (11) 91234-5678.</span> }
+            </label>
+          </div>
+        </fieldset>
+
+        <fieldset class="card">
+          <legend>2. Entrega</legend>
+          <div class="opts">
+            <label class="opt"><input type="radio" formControlName="entrega" value="entrega" /> <span><strong>Entrega em casa</strong><small>{{ cart.freteEntrega() === 0 ? 'Grátis' : (cart.freteEntrega() | currency: 'BRL') }}</small></span></label>
+            <label class="opt"><input type="radio" formControlName="entrega" value="retirada" /> <span><strong>Retirar na loja</strong><small>Grátis · pronto em 2 horas</small></span></label>
+          </div>
+          @if (!retirada()) {
+            <div class="two">
+              <label class="field" [class.invalid]="invalid('cep')">
+                CEP
+                <!-- máscara 00000-000, máximo de 9 caracteres contando o traço -->
+                <input formControlName="cep" inputmode="numeric" maxlength="9" autocomplete="postal-code" placeholder="00000-000" (input)="mascararCampo('cep', $event)" />
+                @if (invalid('cep')) { <span class="err">CEP inválido. Use 8 números.</span> }
+              </label>
+              <label class="field" [class.invalid]="invalid('cidade')">
+                Cidade
+                <input formControlName="cidade" autocomplete="address-level2" />
+              </label>
+            </div>
+            <div class="two wide">
+              <label class="field" [class.invalid]="invalid('rua')">
+                Rua
+                <input formControlName="rua" autocomplete="address-line1" />
+                @if (invalid('rua')) { <span class="err">Informe a rua.</span> }
+              </label>
+              <label class="field" [class.invalid]="invalid('numero')">
+                Número
+                <input formControlName="numero" />
+                @if (invalid('numero')) { <span class="err">Obrigatório.</span> }
+              </label>
+            </div>
+            <label class="field" [class.invalid]="invalid('bairro')">
+              Bairro
+              <input formControlName="bairro" />
+              @if (invalid('bairro')) { <span class="err">Informe o bairro.</span> }
+            </label>
+          }
+        </fieldset>
+
+        <fieldset class="card">
+          <legend>3. Pagamento</legend>
+          <div class="opts">
+            <label class="opt"><input type="radio" formControlName="pagamento" value="pix" /> <span><strong>Pix</strong><small>Aprovação na hora</small></span></label>
+            <label class="opt"><input type="radio" formControlName="pagamento" value="cartao" /> <span><strong>Cartão de crédito</strong><small>Em até 3x sem juros</small></span></label>
+            <label class="opt"><input type="radio" formControlName="pagamento" value="dinheiro" /> <span><strong>Dinheiro na entrega/retirada</strong><small>Pague ao receber</small></span></label>
+          </div>
+
+          @if (cartao()) {
+            <div class="pay">
+              <label class="field" [class.invalid]="invalid('cartaoNumero')">
+                Número do cartão
+                <input formControlName="cartaoNumero" inputmode="numeric" autocomplete="cc-number" placeholder="0000 0000 0000 0000" (input)="mascarar('cartaoNumero', $event)" />
+                @if (invalid('cartaoNumero')) { <span class="err">Número de cartão inválido.</span> }
+              </label>
+              <label class="field" [class.invalid]="invalid('cartaoNome')">
+                Nome impresso no cartão
+                <input formControlName="cartaoNome" autocomplete="cc-name" />
+                @if (invalid('cartaoNome')) { <span class="err">Informe o nome.</span> }
+              </label>
+              <div class="two">
+                <label class="field" [class.invalid]="invalid('cartaoValidade')">
+                  Validade
+                  <input formControlName="cartaoValidade" inputmode="numeric" autocomplete="cc-exp" placeholder="MM/AA" (input)="mascarar('cartaoValidade', $event)" />
+                  @if (invalid('cartaoValidade')) { <span class="err">Validade inválida.</span> }
+                </label>
+                <label class="field" [class.invalid]="invalid('cartaoCvv')">
+                  CVV
+                  <input formControlName="cartaoCvv" inputmode="numeric" autocomplete="cc-csc" placeholder="123" (input)="mascarar('cartaoCvv', $event)" />
+                  @if (invalid('cartaoCvv')) { <span class="err">3 ou 4 números.</span> }
+                </label>
+              </div>
+              <label class="field">
+                Parcelas
+                <select formControlName="parcelas">
+                  @for (o of opcoesParcela(); track o.n) {
+                    <option [ngValue]="o.n">{{ o.n }}x de {{ o.valor | currency: 'BRL' }} sem juros</option>
+                  }
+                </select>
+              </label>
+              <p class="demo">Demonstração: nenhum dado é enviado e só os 4 últimos dígitos ficam salvos no pedido.</p>
+            </div>
+          }
+
+          @if (pix()) {
+            <div class="pay">
+              <p>Copie o código abaixo e cole no app do seu banco (Pix copia e cola):</p>
+              <textarea class="pixcode" readonly rows="4" [value]="pixCodigo()"></textarea>
+              <button type="button" class="btn ghost sm" (click)="copiarPix()">{{ copiado() ? 'Código copiado ✓' : 'Copiar código Pix' }}</button>
+              <p class="demo">Demonstração: a chave é fictícia, então o código não recebe pagamento de verdade.</p>
+            </div>
+          }
+        </fieldset>
+      </div>
+
+      <aside class="summary card">
+        <h2>Seu pedido</h2>
+        <ul>
+          @for (i of cart.items(); track i.product.id) {
+            <li><span>{{ i.qty }}× {{ i.product.name }}</span><span>{{ i.total | currency: 'BRL' }}</span></li>
+          }
+        </ul>
+        <div class="row"><span>Subtotal</span><span>{{ cart.subtotal() | currency: 'BRL' }}</span></div>
+        <div class="row"><span>{{ retirada() ? 'Retirada' : 'Entrega' }}</span><span>{{ frete() === 0 ? 'Grátis' : (frete() | currency: 'BRL') }}</span></div>
+        @if (cart.desconto() > 0) {
+          <div class="row"><span>Desconto ({{ cart.cupom() }})</span><span>− {{ cart.desconto() | currency: 'BRL' }}</span></div>
+        }
+        <div class="row grand"><span>Total</span><span>{{ total() | currency: 'BRL' }}</span></div>
+        @if (erro()) { <p class="err" role="alert">{{ erro() }}</p> }
+        @if (submitted() && form.invalid) { <p class="err" role="alert">Confira os campos destacados.</p> }
+        <button type="submit" class="btn block">Confirmar pedido</button>
+        <a class="link more" routerLink="/sacola">← Voltar para a sacola</a>
+      </aside>
+    </form>
+  }
+</div>

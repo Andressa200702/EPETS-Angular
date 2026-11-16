@@ -1,0 +1,33 @@
+<article class="pcard">
+  <a class="ph" [routerLink]="['/produto', product().id]" [attr.aria-label]="'Ver ' + product().name">
+    <app-product-img [product]="product()" />
+    @if (soldOut()) {
+      <span class="tag bad">Indisponível</span>
+    } @else if (low()) {
+      <span class="tag warn">Últimas unidades</span>
+    }
+  </a>
+  <span class="cat">{{ label() }}</span>
+  <h3><a [routerLink]="['/produto', product().id]">{{ product().name }}</a></h3>
+  <span class="det">{{ product().detail }}</span>
+  <div class="price">{{ product().price | currency: 'BRL' }}</div>
+  <!-- Se o produto já está na sacola, mostra o controle verde (− 1 na sacola +); -->
+  <!-- se não está (ou está esgotado), mostra o botão "Adicionar à sacola". -->
+  @if (!soldOut() && inCart() > 0) {
+    <div class="stepper" role="group" [attr.aria-label]="'Quantidade de ' + product().name + ' na sacola'">
+      <button type="button" (click)="setQty(inCart() - 1)" aria-label="Diminuir">−</button>
+      <span>{{ inCart() }} na sacola</span>
+      <!-- o + fica desativado quando a quantidade chega no estoque disponível -->
+      <button type="button" (click)="setQty(inCart() + 1)" [disabled]="inCart() >= product().stock" aria-label="Aumentar">+</button>
+    </div>
+  } @else {
+    <button class="btn block" type="button" (click)="add()" [disabled]="soldOut()">
+      @if (soldOut()) {
+        Indisponível
+      } @else {
+        Adicionar à sacola
+        <svg class="ico" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+      }
+    </button>
+  }
+</article>

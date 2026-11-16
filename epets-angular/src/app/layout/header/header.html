@@ -1,0 +1,69 @@
+<div class="topbar">
+  Cuidado de perto, do nosso bairro para a sua casa. &nbsp;•&nbsp; Preços e disponibilidade ilustrativos
+</div>
+
+<header class="site">
+  <div class="wrap hrow">
+    <a class="logo" routerLink="/" aria-label="E’PETS, ir para o início">
+      <img src="epets-logo.png" alt="E’PETS" />
+    </a>
+
+    <form class="search" role="search" (submit)="$event.preventDefault(); buscar(busca.value)">
+      <svg class="ico" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>
+      <input #busca type="search" placeholder="O que seu pet precisa hoje?" aria-label="Buscar" />
+    </form>
+
+    <div class="hact">
+      @if (auth.user(); as u) {
+        <div class="perfil">
+          <button type="button" class="entrar logado" aria-haspopup="menu" [attr.aria-expanded]="menuAberto()" (click)="menuAberto.set(!menuAberto())">
+            <svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4" /><path d="M4 21c0-4 4-6 8-6s8 2 8 6" /></svg>
+            {{ primeiroNome() }}
+          </button>
+          @if (menuAberto()) {
+            <div class="perfil-menu" role="menu">
+              <div class="quem">
+                <strong>{{ u.name }}</strong>
+                <small>{{ u.email }}</small>
+              </div>
+              @if (auth.isAdmin()) {
+                <a role="menuitem" routerLink="/admin" (click)="menuAberto.set(false)">Painel admin</a>
+              } @else {
+                <a role="menuitem" routerLink="/meus-pedidos" (click)="menuAberto.set(false)">Meus pedidos</a>
+                <!-- link do menu do perfil que abre a tela de alterar senha (só aparece para cliente, não para admin) -->
+                <a role="menuitem" routerLink="/alterar-senha" (click)="menuAberto.set(false)">Alterar senha</a>
+              }
+              <button type="button" role="menuitem" (click)="sair()">Sair</button>
+            </div>
+          }
+        </div>
+      } @else {
+        <a class="entrar" routerLink="/entrar">
+          <svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4" /><path d="M4 21c0-4 4-6 8-6s8 2 8 6" /></svg>
+          Entrar
+        </a>
+      }
+      <a class="chat" [href]="whatsapp" target="_blank" rel="noopener">
+         <svg class="ico" viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z" /></svg>
+        Vamos conversar?
+      </a>
+      <a class="bagbtn" routerLink="/sacola">
+        <svg class="ico" viewBox="0 0 24 24"><path d="M5 8h14l-1 12H6L5 8z" /><path d="M9 8V6a3 3 0 0 1 6 0v2" /></svg>
+        Sacola ({{ cart.count() }})
+      </a>
+    </div>
+  </div>
+
+  <nav class="cats" aria-label="Categorias">
+    <div class="wrap">
+      @for (item of nav; track item.key) {
+        <a
+          [routerLink]="item.path"
+          [queryParams]="item.params"
+          [fragment]="item.fragment"
+          [class.on]="activeKey() === item.key"
+        >{{ item.label }}</a>
+      }
+    </div>
+  </nav>
+</header>

@@ -1,0 +1,100 @@
+<div class="wrap page">
+  <nav class="crumbs" aria-label="Você está aqui"><a routerLink="/">Início</a> / <span>Sacola</span></nav>
+  <!-- título da página da sacola -->
+  <h1>Uma sacola cheia de cuidado.</h1>
+
+  @if (cart.items().length === 0) {
+    <div class="empty card">
+      <svg class="ico big" viewBox="0 0 24 24"><path d="M5 8h14l-1 12H6L5 8z" /><path d="M9 8V6a3 3 0 0 1 6 0v2" /></svg>
+      <h2>Sua sacola está vazia.</h2>
+      <p class="muted">Que tal escolher algo gostoso para o seu pet?</p>
+      <a class="btn" routerLink="/catalogo">Ver produtos</a>
+    </div>
+  } @else {
+    <!-- subtítulo: quantos produtos diferentes (items().length) e quantas unidades no total (count()), com singular/plural -->
+    <p class="lead">
+      {{ cart.items().length }} {{ cart.items().length === 1 ? 'produto' : 'produtos' }} •
+      {{ cart.count() }} {{ cart.count() === 1 ? 'unidade escolhida' : 'unidades escolhidas' }} para o seu pet
+    </p>
+
+    <div class="layout">
+      <section class="lines card" aria-label="Itens da sacola">
+        <div class="thead" aria-hidden="true">
+          <span>Produto</span><span>Quantidade</span><span class="r">Subtotal</span>
+        </div>
+        <ul>
+          @for (i of cart.items(); track i.product.id) {
+            <li class="line">
+              <a class="thumb" [routerLink]="['/produto', i.product.id]"><app-product-img [product]="i.product" /></a>
+              <div class="desc">
+                <span class="eyebrow">{{ i.product.brand }}</span>
+                <a class="name" [routerLink]="['/produto', i.product.id]">{{ i.product.name }}</a>
+                <span class="muted small">{{ i.product.detail }}</span>
+                <span class="muted small">{{ i.product.price | currency: 'BRL' }} / unidade</span>
+              </div>
+              <div class="qty" role="group" [attr.aria-label]="'Quantidade de ' + i.product.name">
+                <button type="button" (click)="cart.setQty(i.product.id, i.qty - 1)" aria-label="Diminuir">−</button>
+                <span>{{ i.qty }}</span>
+                <button type="button" (click)="cart.setQty(i.product.id, i.qty + 1)" [disabled]="i.qty >= i.product.stock" aria-label="Aumentar">+</button>
+              </div>
+              <div class="total">
+                <strong>{{ i.total | currency: 'BRL' }}</strong>
+                <button type="button" class="link" (click)="cart.remove(i.product.id)">Remover</button>
+              </div>
+            </li>
+          }
+        </ul>
+        <div class="foot">
+          <a class="btn ghost" routerLink="/catalogo">← Escolher mais produtos</a>
+          <button type="button" class="link" (click)="esvaziar()">Esvaziar sacola</button>
+        </div>
+      </section>
+
+      <div class="side">
+        <aside class="summary card">
+          <h2>Resumo do pedido</h2>
+          <div class="row"><span class="muted">Produtos ({{ cart.count() }} {{ cart.count() === 1 ? 'unidade' : 'unidades' }})</span><span>{{ cart.subtotal() | currency: 'BRL' }}</span></div>
+          <div class="row"><span class="muted">Entrega local</span><span>{{ cart.freteEntrega() | currency: 'BRL' }}</span></div>
+          <div class="row"><span class="muted">Descontos</span><span [class.ok]="cart.desconto() > 0">{{ cart.desconto() > 0 ? '− ' : '' }}{{ cart.desconto() | currency: 'BRL' }}</span></div>
+          <div class="row grand"><span>Total</span><span class="serif">{{ cart.total() | currency: 'BRL' }}</span></div>
+
+          <form class="coupon" (submit)="$event.preventDefault(); aplicarCupom(cupom.value)">
+            <input #cupom type="text" placeholder="Cupom (teste: BEMVINDO10)" aria-label="Cupom de desconto" [value]="cart.cupom()" />
+            @if (cart.cupom()) {
+              <button type="button" class="btn dark" (click)="removerCupom(); cupom.value = ''">Remover</button>
+            } @else {
+              <button type="submit" class="btn dark">Aplicar</button>
+            }
+          </form>
+          @if (msgCupom(); as m) {
+            <p class="msg" [class.bad]="!m.ok" role="status">{{ m.texto }}</p>
+          }
+
+          <a class="btn block" routerLink="/checkout">
+            Finalizar pedido
+            <svg class="ico" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+          </a>
+          <p class="hint center">Formas de pagamento: crédito, débito, dinheiro ou Pix.</p>
+          <p class="hint lock">
+            <svg class="ico sm" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2" /><path d="M8 11V8a4 4 0 0 1 8 0v3" /></svg>
+            Demonstração visual. Nenhum pedido ou pagamento será realizado.
+          </p>
+        </aside>
+
+        <aside class="summary card cep">
+          <h3>Entrega para o seu endereço</h3>
+          <form class="coupon" (submit)="$event.preventDefault(); calcular(cepInput.value)">
+            <input #cepInput type="text" inputmode="numeric" maxlength="9" placeholder="00000-000" aria-label="CEP" [value]="cart.cep()" />
+            <button type="submit" class="btn ghost">Calcular</button>
+          </form>
+          @if (cepErro()) {
+            <p class="msg bad" role="alert">Digite um CEP válido, com 8 números.</p>
+          } @else if (cart.cep()) {
+            <p class="msg ok">Entrega local • {{ prazo }} • {{ freteFixo | currency: 'BRL' }}</p>
+          }
+          <p class="hint">Endereço fictício para demonstração. Prazo e frete ilustrativos. Retirada na loja é sempre grátis.</p>
+        </aside>
+      </div>
+    </div>
+  }
+</div>
