@@ -1,6 +1,6 @@
 # E’PETS
 
-Front-end da E’PETS, uma loja online de rações e acessórios para cães, gatos, roedores e aves silvestres, com painel administrativo. Projeto Integrador feito em Angular, seguindo o protótipo do Figma Make.
+Front-end da E’PETS, uma loja online de rações e acessórios para cães, gatos, roedores e aves silvestres, com painel administrativo. Projeto Integrador feito em Angular, seguindo o protótipo do Figma.
 
 ## Como rodar
 
